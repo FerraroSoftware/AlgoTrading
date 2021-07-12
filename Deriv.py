@@ -64,5 +64,22 @@ warnings.filterwarnings('ignore')
 
 
 class Deriv():
-   def __init__(self) -> None:
-       pass
+   def __init__(alpha, beta, sigma, risk_free_rate) -> None:
+       self.alpha = alpha
+       self.beta = beta
+       self.sigma = sigma
+       self.risk_free_rate = risk_free_rate
+
+
+   def option_vol_from_surface(self, moneyness, time_to_maturity):
+      return self.sigma + self.alpha * time_to_maturity + self.beta * np.square(moneyness - 1)
+
+   def call_option_price(moneyness, time_to_maturity, option_vol):
+      d1=(np.log(1/moneyness)+(self.risk_free_rate + np.square(option_vol))*time_to_maturity)/(option_vol*np.sqrt(time_to_maturity))
+
+      d2=(np.log(1/moneyness)+(self.risk_free_rate - np.square(option_vol))*time_to_maturity)/(option_vol*np.sqrt(time_to_maturity))
+      
+      N_d1 = norm.cdf(d1)
+      N_d2 = norm.cdf(d2)
+
+      return N_d1 - moneyness * np.exp(-self.risk_free_rate*time_to_maturity) * N_d2
